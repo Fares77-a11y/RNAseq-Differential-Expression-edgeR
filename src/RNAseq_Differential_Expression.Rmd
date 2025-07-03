@@ -1,5 +1,5 @@
 ---
-title: "Assignment 2"
+title: "RNAseq_Differential_Expression"
 author: "Fares_Ibrahim"
 date: "10-05-2024"
 output:
@@ -12,7 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Question 1
+
 
 ```{r Q1 code, message = FALSE}
 # Loading miodin library
@@ -68,7 +68,7 @@ mshow(ms)
 
 ```
 
-## Question 2
+
 
 ```{r Q2 code, message = FALSE}
 library(miodin)
@@ -101,7 +101,7 @@ export(mp,"analysisResult","a23farib_rnaseq")
 
 ```
 
-## Question 3
+#Explanation:
 The data presented provides a focused look at the 10 most significant genes out of a total of 74 that have shown differential expression between the two studied cell lines. Here is a detailed interpretation of the data columns and the biological implications:
 
 Table Description:
