@@ -1,0 +1,144 @@
+---
+title: "Assignment 2"
+author: "Fares_Ibrahim"
+date: "10-05-2024"
+output:
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+```{r Q1 code, message = FALSE}
+# Loading miodin library
+library(miodin)
+
+# Generating a new miodin project
+mp <- MiodinProject(name = "Assignment 2", author = "Fares_Ibrahim", path = ".")
+mshow(a)
+getwd()
+# Load the RNA-seq datafile
+sdrf <- read.table(paste0("Assignment 2/", "a23farib_rnaseq.txt"), header = TRUE, as.is = TRUE, row.names = 1, sep = "\t")
+
+# Printing the first 6 rows of the data to ensure proper structure
+print(head(sdrf))
+print(dim(sdrf))
+#Removing outliers detected from the heatmap and PCA
+sdrf <- sdrf[,-c(3,10,11)]
+# Defining the experimental factor, "Cell Line" in this experiment
+CellLine <- factor(c(rep("LineA", 6), rep("LineB", 5)), levels = c("LineA", "LineB"))
+#sample names retrieved from data column names
+sample_names <- colnames(sdrf)
+
+# Producing sample and assay tables
+sampleTable <- data.frame(
+  SampleName = sample_names,
+  SamplingPoint = paste0("sp", rep(1, ncol(sdrf))),
+  CellLine = CellLine
+)
+
+assayTable <- data.frame(
+  SampleName = sample_names,
+  DataFile = "a23farib_rnaseq.txt",
+  DataColumn = sample_names
+)
+
+# Selecting the study design 
+ms <- studyDesignCaseControl(
+  studyName = "a23farib_rnaseq",
+  factorName = "CellLine",
+  caseName = "LineB",
+  controlName = "LineA",
+  contrastName = "CellLineContrast",
+  numCase = 5,
+  numControl = 6,  
+  sampleTable = sampleTable,
+  assayTable = assayTable,
+  assayTableName = "RNAseqData"
+)
+insert(ms, mp, overwrite=TRUE)
+
+# Print
+mshow(ms)
+
+```
+
+## Question 2
+
+```{r Q2 code, message = FALSE}
+library(miodin)
+
+# Generating new miodin workflow
+mw <- MiodinWorkflow(name = "AnalysisWorkflow")
+
+# Importing the data
+mw <- mw + importProcessedData(
+  name = "RNA-seq importer",
+  experiment = "sequencing",
+  dataType = "rna",
+  datasetName = "a23farib_rnaseq",
+  assayName = "RNAseqData",
+  studyName = "a23farib_rnaseq",
+  contrastName = "CellLineContrast"
+)%>% performOmicsModeling(name = "RNA-seq Analysis",
+                                contrastName = "CellLineContrast",
+                                filterAbsLogFC = 1,  #logFC threshold
+                                filterFDR = 0.05  #FDR threshold
+)
+#Checking proper insertion
+mw <-insert (mw,mp,overwrite=TRUE)
+print(mp)
+# Execution
+mw <- execute(mw)
+saveDataFile(mp)
+
+export(mp,"analysisResult","a23farib_rnaseq")
+
+```
+
+## Question 3
+The data presented provides a focused look at the 10 most significant genes out of a total of 74 that have shown differential expression between the two studied cell lines. Here is a detailed interpretation of the data columns and the biological implications:
+
+Table Description:
+The result data contains several statistical measures critical in evaluating the significance and magnitude of differential gene expression:
+
+row names (Gene Identifiers)
+Description: The unique identifiers or Ensembl IDs for each gene. These IDs are crucial for identifying the genes in genomic databases, where more detailed functional and biological information can be derived.
+
+logFC (Log Fold Change)
+Description: Measures the logarithm of the ratio of expression levels between Cell Line B (treatment) and Cell Line A (control). A positive logFC indicates higher expression in Cell Line B, whereas a negative value indicates higher expression in Cell Line A.
+
+logCPM (Log of Counts Per Million)
+Description: Indicates the average expression level of the gene across all samples, adjusted for library size, and reported on a logarithmic scale. Higher values suggest that the gene is highly expressed in the samples.
+
+F (F-statistic)
+Description: Represents the statistic from a test comparing variances across groups, where higher values indicate greater statistical evidence for differential expression.
+
+P-Value (Probability Value)
+Description: Provides the p-value from the statistical test, which estimates the probability of observing the test statistic as extreme as the one observed under the null hypothesis (no difference in expression between the cell lines). Lower values suggest stronger evidence against the null hypothesis.
+
+FDR (False Discovery Rate)
+Description: Adjusts the p-value for multiple comparisons, controlling the expected proportion of incorrect rejections of the null hypothesis (false discoveries). Lower FDR values indicate a lower likelihood of the gene being a false positive.                                           
+
+Summary and Implications
+This analysis pinpointed genes with dramatic changes in expression between two distinct cell lines. The diversity in expression profiles underscores the genetic differences potentially driving varied biological behaviors or responses in these cell lines. For instance, genes showing strong upregulation in Cell Line B (positive logFC values) might be implicated in specific pathways activated uniquely in that cell line, while those downregulated (negative logFC) may suggest suppression or regulatory mechanisms active in Cell Line A.
+
+
+
+```{r Q3 code, message = FALSE}
+#Retrieving the excel file of significantly expressed genes along with their respective logFC, P-values, and FDR
+results <- openxlsx::read.xlsx("C:/Users/Ram/Downloads/Bioinformatics/Assignment 2/exports/analysisResults/a23farib_rnaseq/RNA-seq Analysis/a23farib_rnaseq Differential testing.xlsx")
+
+
+results
+#Selecting the top 10 genes
+results<-results[1:10,]
+
+knitr::kable(results[1:10,])
+
+```
