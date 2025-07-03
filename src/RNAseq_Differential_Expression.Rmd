@@ -23,7 +23,7 @@ mp <- MiodinProject(name = "Assignment 2", author = "Fares_Ibrahim", path = ".")
 mshow(a)
 getwd()
 # Load the RNA-seq datafile
-sdrf <- read.table(paste0("Assignment 2/", "a23farib_rnaseq.txt"), header = TRUE, as.is = TRUE, row.names = 1, sep = "\t")
+sdrf <- read.table(paste0("Assignment 2/", "Assignment2_workspace.txt"), header = TRUE, as.is = TRUE, row.names = 1, sep = "\t")
 
 # Printing the first 6 rows of the data to ensure proper structure
 print(head(sdrf))
@@ -44,13 +44,13 @@ sampleTable <- data.frame(
 
 assayTable <- data.frame(
   SampleName = sample_names,
-  DataFile = "a23farib_rnaseq.txt",
+  DataFile = "Assignment2_workspace.txt",
   DataColumn = sample_names
 )
 
 # Selecting the study design 
 ms <- studyDesignCaseControl(
-  studyName = "a23farib_rnaseq",
+  studyName = "Assignment2_workspace",
   factorName = "CellLine",
   caseName = "LineB",
   controlName = "LineA",
@@ -81,9 +81,9 @@ mw <- mw + importProcessedData(
   name = "RNA-seq importer",
   experiment = "sequencing",
   dataType = "rna",
-  datasetName = "a23farib_rnaseq",
+  datasetName = "Assignment2_workspace",
   assayName = "RNAseqData",
-  studyName = "a23farib_rnaseq",
+  studyName = "Assignment2_workspace",
   contrastName = "CellLineContrast"
 )%>% performOmicsModeling(name = "RNA-seq Analysis",
                                 contrastName = "CellLineContrast",
@@ -97,7 +97,7 @@ print(mp)
 mw <- execute(mw)
 saveDataFile(mp)
 
-export(mp,"analysisResult","a23farib_rnaseq")
+export(mp,"analysisResult","Assignment2_workspace")
 
 ```
 
