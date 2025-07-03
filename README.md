@@ -30,7 +30,7 @@ This project demonstrates a statistical RNA-seq analysis pipeline using **genera
 ```
 RNAseq-Differential-Expression-Pipeline/
 ├── data/
-│   └── Assignment2_workspace.RData
+│   └── Assignment2_workspace.txt
 ├── results/
 │   └── differential_expression_results.xlsx
 ├── src/
